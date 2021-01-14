@@ -38,7 +38,7 @@ namespace EquipmentTrackingSystem.Extension.Services
 
             if (resource == null)
             {
-                throw new Exception("ERR002: The resource not found.");
+                return null;
             }
 
             return resource;

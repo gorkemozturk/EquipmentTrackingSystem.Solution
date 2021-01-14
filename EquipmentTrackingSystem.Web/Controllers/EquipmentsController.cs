@@ -54,53 +54,65 @@ namespace EquipmentTrackingSystem.Web.Controllers
         [HttpPost("{clinicId}")]
         public async Task<ActionResult<Equipment>> PostEquipment([FromRoute] int clinicId, [FromBody] Equipment equipment)
         {
-            try
+            if (clinicId != equipment.ClinicId)
             {
-                var resource = await _equipment.CreateEquipmentAsync(clinicId, equipment);
-                LoggerService.GetInstance.CreateLog($"[PostEquipment: {clinicId}] The post process has completed successfully.");
-                
-                return resource;
+                LoggerService.GetInstance.CreateLog($"[PostEquipment: {clinicId}] The criteria did not match.");
+
+                return BadRequest();
             }
-            catch (Exception e)
+
+            var result = await _equipment.CreateEquipmentAsync(clinicId, equipment);
+
+            if (result == null)
             {
-                LoggerService.GetInstance.CreateLog("[PostEquipment: {clinicId}]" + e.Message);
-                
-                throw new Exception(e.Message);
+                LoggerService.GetInstance.CreateLog($"[PostEquipment: {clinicId}] The clinic not found.");
+
+                return NotFound();
             }
+
+            LoggerService.GetInstance.CreateLog($"[PostEquipment: {clinicId}] The post process has completed successfully.");
+
+            return result;
         }
 
         [HttpGet("{id}", Name = "GetEquipment")]
         public async Task<ActionResult<Equipment>> GetEquipment([FromRoute] int id)
         {
-            try
-            {
-                var resource = await _equipment.GetResourceAsync(id);
-                LoggerService.GetInstance.CreateLog($"[GetEquipment: {id}] The get process has completed successfully.");
 
-                return resource;
-            }
-            catch (Exception e)
+            var equipment = await _equipment.GetResourceAsync(id);
+
+            if (equipment == null)
             {
-                LoggerService.GetInstance.CreateLog($"[GetEquipment: {id}] " + e.Message);
-                
-                throw new Exception(e.Message);
+                LoggerService.GetInstance.CreateLog($"[GetEquipment: {id}] The equipment not found.");
+
+                return NotFound();
             }
+
+            LoggerService.GetInstance.CreateLog($"[GetEquipment: {id}] The get process has completed successfully.");
+
+            return equipment;
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEquipment([FromRoute] int id, [FromBody] EquipmentUpdateViewModel equipment)
         {
-            try
+            if (id != equipment.Id)
             {
-                await _equipment.UpdateEquipmentAsync(id, equipment);
-                LoggerService.GetInstance.CreateLog($"[PutEquipment: {id}] The put process has completed successfully.");
+                LoggerService.GetInstance.CreateLog($"[PutEquipment: {id}] The criteria did not match.");
+
+                return BadRequest();
             }
-            catch (Exception e)
+
+            var result = await _equipment.UpdateEquipmentAsync(id, equipment);
+
+            if (result == null)
             {
-                LoggerService.GetInstance.CreateLog($"[PutEquipment: {id}] " + e.Message);
-                
-                throw new Exception(e.Message);
+                LoggerService.GetInstance.CreateLog($"[PutEquipment: {id}] The equipment not found.");
+
+                return NotFound();
             }
+
+            LoggerService.GetInstance.CreateLog($"[PutEquipment: {id}] The put process has completed successfully.");
 
             return NoContent();
         }

@@ -16,21 +16,6 @@ namespace EquipmentTrackingSystem.Extension.Services
         {
         }
 
-        public async Task<Clinic> DeleteClinicAsync(int id)
-        {
-            var clinic = await GetClinic(id);
-
-            if (clinic.Equipments.Count() > 0)
-            {
-                throw new Exception("ERR007: Cannot delete the clinic since there existed an equipment which belongs to it.");
-            }
-
-            _context.Clinics.Remove(clinic);
-            await _context.SaveChangesAsync();
-
-            return clinic;
-        }
-
         public async Task<PaginationService<ClinicIndexViewModel>> GetClinicsAsync(ParameterCommonViewModel parameter)
         {
             var clinics = await _context.Clinics.Include(c => c.Equipments).Select(c => new ClinicIndexViewModel 
@@ -56,9 +41,18 @@ namespace EquipmentTrackingSystem.Extension.Services
             return await _context.Clinics.AnyAsync(c => c.Id == id);
         }
 
-        private async Task<Clinic> GetClinic(int id)
+        public async Task<Clinic> GetClinicWithEquipments(int id)
         {
-            return await _context.Clinics.Include(c => c.Equipments).FirstOrDefaultAsync(c => c.Id == id);
+            var clinic = await _context.Clinics
+                .Include(c => c.Equipments)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (clinic == null)
+            {
+                return null;
+            }
+
+            return clinic;
         }
     }
 }

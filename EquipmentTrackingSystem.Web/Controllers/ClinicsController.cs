@@ -72,19 +72,16 @@ namespace EquipmentTrackingSystem.Web.Controllers
         [HttpGet("{id}", Name = "GetClinic")]
         public async Task<ActionResult<Clinic>> GetClinic([FromRoute] int id)
         {
-            try
-            {
-                var resource = await _clinic.GetResourceAsync(id);
-                LoggerService.GetInstance.CreateLog($"[GetClinic: {id}] The get process has completed successfully.");
+            var clinic = await _clinic.GetResourceAsync(id);
 
-                return resource;
-            }
-            catch (Exception e)
+            if (clinic == null)
             {
-                LoggerService.GetInstance.CreateLog($"[GetClinic: {id}] " + e.Message);
+                LoggerService.GetInstance.CreateLog($"[GetClinic: {id}] Clinic not found.");
                 
-                throw new Exception(e.Message);
+                return NotFound();
             }
+
+            return clinic;
         }
 
         [HttpPut("{id}")]
@@ -115,12 +112,26 @@ namespace EquipmentTrackingSystem.Web.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Clinic>> DeleteClinic([FromRoute] int id)
         {
+            var clinic = await _clinic.GetClinicWithEquipments(id);
+
+            if (clinic == null)
+            {
+                LoggerService.GetInstance.CreateLog($"[DeleteClinic: {id}] The clinic not found.");
+                
+                return NotFound();
+            }
+
+            if (clinic.Equipments.Count() > 0)
+            {
+                LoggerService.GetInstance.CreateLog($"[DeleteClinic: {id}] The clinic cannot delete since it has equipments.");
+                
+                return BadRequest();
+            }
+
             try
             {
-                var resource = await _clinic.DeleteClinicAsync(id);
+                var resource = await _clinic.RemoveResourceAsync(id);
                 LoggerService.GetInstance.CreateLog($"[DeleteClinic: {id}] The delete process has completed successfully.");
-
-                return resource;
             }
             catch (Exception e)
             {
@@ -128,6 +139,8 @@ namespace EquipmentTrackingSystem.Web.Controllers
                 
                 throw new Exception(e.Message);
             }
+
+            return NoContent();
         }
     }
 }

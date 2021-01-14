@@ -45,7 +45,7 @@ namespace EquipmentTrackingSystem.UnitTest
         }
 
         [Fact]
-        public async Task PostEquipmentShouldReturnExeptionWhenCriteriaIsNotFetching()
+        public async Task PostEquipmentShouldReturnNullWhenCriteriaIsNotFetching()
         {
             // Arrange
             var clinicId = 5;
@@ -68,9 +68,8 @@ namespace EquipmentTrackingSystem.UnitTest
 
             // Assert
             var result = Assert.IsType<ActionResult<Equipment>>(request);
-            var model = Assert.IsAssignableFrom<Equipment>(result.Value);
 
-            Assert.NotEqual(clinicId, equipment.ClinicId);
+            Assert.Null(request.Value);
         }
     }
 }

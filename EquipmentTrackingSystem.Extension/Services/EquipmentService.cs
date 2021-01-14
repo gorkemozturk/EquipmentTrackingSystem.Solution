@@ -22,14 +22,9 @@ namespace EquipmentTrackingSystem.Extension.Services
 
         public async Task<Equipment> CreateEquipmentAsync(int clinicId, Equipment equipment)
         {
-            if (clinicId != equipment.ClinicId)
-            {
-                throw new Exception("ERR006: Criteria not matched.");
-            }
-
             if (!await _clinic.IsClinicExistsAsync(clinicId))
             {
-                throw new Exception("ERR005: The clinic not found.");
+                return null;
             }
 
             _context.Equipments.Add(equipment);
@@ -67,11 +62,6 @@ namespace EquipmentTrackingSystem.Extension.Services
 
         public async Task<Equipment> UpdateEquipmentAsync(int id, EquipmentUpdateViewModel equipment)
         {
-            if (id != equipment.Id)
-            {
-                throw new Exception("ERR006: Criteria not matched.");
-            }
-
             var resource = await GetResourceAsync(id);
 
             resource.EquipmentName = equipment.EquipmentName;

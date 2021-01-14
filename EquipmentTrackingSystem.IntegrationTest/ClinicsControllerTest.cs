@@ -101,10 +101,10 @@ namespace EquipmentTrackingSystem.IntegrationTest
         }
 
         [Fact]
-        public async Task DeleteClinicEndpointShouldReturnOK()
+        public async Task DeleteClinicEndpointShouldReturnNoContent()
         {
             // Arrange
-            var clinic = new Clinic() { Id = 36 };
+            var clinic = new Clinic() { Id = 34 };
 
             // Act
             var request = await _client.DeleteAsync("api/clinics/" + clinic.Id);
@@ -115,9 +115,7 @@ namespace EquipmentTrackingSystem.IntegrationTest
             // Assert
             request.EnsureSuccessStatusCode();
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, request.StatusCode);
-            Assert.NotNull(result);
-            Assert.Equal(clinic.Id, result.Id);
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, request.StatusCode);
         }
     }
 }
